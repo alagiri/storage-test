@@ -9,7 +9,6 @@
     "supportUrl": "https://www.esri.com",
     "gitHubUrl": ""
   },
-  "apiVersion": "3.8.2",
   "author": { "name": "Esri", "email": "support@esri.com" },
   "assets": { "icon": "assets/icon.png" },
   "externalJS": null,
