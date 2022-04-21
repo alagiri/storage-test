@@ -36,64 +36,51 @@ import EnumerateVisualObjectInstancesOptions = powerbi.EnumerateVisualObjectInst
 import VisualObjectInstance = powerbi.VisualObjectInstance;
 import DataView = powerbi.DataView;
 import VisualObjectInstanceEnumerationObject = powerbi.VisualObjectInstanceEnumerationObject;
+import ILocalVisualStorageService = powerbi.extensibility.ILocalVisualStorageService;
 
 import { VisualSettings } from "./settings";
 export class Visual implements IVisual {
     private target: HTMLElement;
-    // private updateCount: number;
     private settings: VisualSettings;
     private textNode: Text;
     private host: IVisualHost;
+    private storage: ILocalVisualStorageService;
 
     constructor(options: VisualConstructorOptions) {
         console.log('Visual constructor', options);
         this.host = options.host;
+        this.storage = this.host.storageService;
         this.target = options.element;
-        // this.updateCount = 0;
-        // const updateCount
+        
         if (document) {
             const new_p: HTMLElement = document.createElement("p");
             new_p.appendChild(document.createTextNode("Update count:"));
             const new_em: HTMLElement = document.createElement("em");
-            // this.textNode = document.createTextNode(this.updateCount.toString());
             this.textNode = document.createTextNode("0");
             new_em.appendChild(this.textNode);
             new_p.appendChild(new_em);
             this.target.appendChild(new_p);
-            debugger;
-            // debugger;
-            // this.host.storageService.get("updateCount").then((updateCount) => {
-            //     this.updateCount = parseInt(updateCount) || 0;
-            // }).catch((reason) => {
-            //     this.updateCount = 0;
-            //     this.host.storageService.set("updateCount", JSON.stringify(this.updateCount));
-            //     console.log(reason);
-            // });
         }
     }
 
     public update(options: VisualUpdateOptions) {
-        this.settings = Visual.parseSettings(options && options.dataViews && options.dataViews[0]);
         console.log('Visual update', options);
-        // if (this.textNode) {
-        //     this.textNode.textContent = (this.updateCount++).toString();
-        // }
-        debugger;
+        this.settings = Visual.parseSettings(options && options.dataViews && options.dataViews[0]);
         this.incrementCount();
     }
 
     private incrementCount () {
-        this.host.storageService.get("updateCount").then(count => {
+        this.storage.get("updateCount").then(count => {
             let newCount = parseInt(count) || 0;
             newCount++;
-            this.host.storageService.set("updateCount", JSON.stringify(newCount));
+            this.storage.set("updateCount", newCount.toString());
             if (this.textNode) {
                 this.textNode.textContent = newCount.toString();
             }
         }).catch((ex)=> {
             console.log("failed", ex);
             let count = 0;
-            this.host.storageService.set("updateCount", JSON.stringify(count));
+            this.storage.set("updateCount", count.toString());
         });
     }
 
